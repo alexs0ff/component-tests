@@ -1,0 +1,10 @@
+{
+  "DatabaseConfig": {
+    "Connectionstring": "Host=localhost;Port=5432;Database=shop;Username=postgres;Password=postgres;Include Error Detail=true",
+    "TablesToClean": "OrderItems, Orders, Baskets, Users"
+  },
+  "TestsConfig": {
+    "ShopUrl": "http://localhost:5179",
+    "MockServerUrl": "http://localhost:1080"
+  }
+}

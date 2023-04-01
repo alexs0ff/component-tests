@@ -1,0 +1,49 @@
+version: "3.5"
+
+services:
+  shop-app: 
+    container_name: shop-app 
+    build:
+      context: .
+      dockerfile: ./Dockerfile 
+      target: development
+    ports:
+      - "5179:80"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://*:80      
+      CONNECTIONSTRINGS__SHOP: "Host=shop-postgres;Port=5432;Database=shop;Username=postgres;Password=postgres;Include Error Detail=true"
+      SERVICEURLS__GOODS: http://shop-mock-server:1080
+      SERVICEURLS__ORDERS: http://shop-mock-server:1080
+    depends_on:
+      - shop-postgres
+      - shop-mock-server
+  shop-tests: 
+    container_name: shop-tests 
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+      target: tests
+    environment:
+      SERVICEURLS__GOODS: http://shop-mock-server:1080
+      SERVICEURLS__ORDERS: http://shop-mock-server:1080
+      TESTSCONFIG__SHOPURL: http://shop-app:80
+      TESTSCONFIG__MOCKSERVERURL: http://shop-mock-server:1080
+      DATABASECONFIG__CONNECTIONSTRING: "Host=shop-postgres;Port=5432;Database=shop;Username=postgres;Password=postgres;Include Error Detail=true"
+    depends_on:
+      - shop-postgres
+      - shop-mock-server
+      - shop-app
+  shop-postgres: 
+    container_name: shop-postgres 
+    image: postgres:12         
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres 
+  shop-mock-server:
+    container_name: shop-mock-server 
+    image: mockserver/mockserver:5.13.2
+    ports:
+      - 1080:1080
